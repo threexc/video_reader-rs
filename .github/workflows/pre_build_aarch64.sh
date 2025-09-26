@@ -16,8 +16,9 @@ sed -i -e 's/deb http/deb [arch=amd64] http/g' /etc/apt/sources.list
 # update and install deps
 apt update
 apt install -y binutils-aarch64-linux-gnu clang gcc-aarch64-linux-gnu \
-  gcc-aarch64-linux-gnu libasound2-dev:arm64 libcrypt-dev:arm64 libnsl-dev:arm64 \
-  libxv-dev:arm64  multistrap pkg-config:arm64 python3-pip rpcsvc-proto:arm64 xz-utils:arm64 \
+  gcc-aarch64-linux-gnu libasound2-dev:arm64 libavutil-dev:arm64 \
+  libcrypt-dev:arm64 libnsl-dev:arm64 \ libxv-dev:arm64  multistrap \
+  pkg-config:arm64 python3-pip rpcsvc-proto:arm64 xz-utils:arm64 \
   uuid-dev:arm64 libxcb-shm0:arm64 libxcb-xfixes0:arm64 libxcb-shape0:arm64
 
 pip install "maturin>=1.3,<2.0" patchelf
