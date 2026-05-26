@@ -23,6 +23,9 @@ jobs:
           - runner: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
             arch: aarch64
+          - runner: ubuntu-24.04-riscv
+            target: riscv64gc-unknown-linux-gnu
+            arch: riscv64
     env:
       FFMPEG_DIR: ${{ github.workspace }}/ffmpeg
       FFMPEG_VERS: 8.1.1-1
@@ -43,7 +46,8 @@ jobs:
           )
           echo "ffmpeg_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
 
-      - name: Build wheels
+      - name: Build wheels (x86_64, aarch64)
+        if: matrix.platform.arch != 'riscv64'
         uses: PyO3/maturin-action@e83996d129638aa358a18fbd1dfb82f0b0fb5d3b  # v1.51.0
         with:
           target: ${{ matrix.platform.target }}
@@ -54,6 +58,25 @@ jobs:
             tar -zxf ffmpeg.tar.gz -C ${{ env.FFMPEG_DIR }}
           args: --release --out dist --interpreter '3.9 3.10 3.11 3.12 3.13 3.13t 3.14 3.14t pypy3.11'
           manylinux: 2_34
+          docker-options: -e CI -e FFMPEG_DIR=${{ env.FFMPEG_DIR }}
+      - name: Upload wheels
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: wheels-linux-${{ matrix.platform.arch }}
+          path: dist
+
+      - name: Build wheels (riscv64)
+        if: matrix.platform.arch == 'riscv64'
+        uses: PyO3/maturin-action@e83996d129638aa358a18fbd1dfb82f0b0fb5d3b  # v1.51.0
+        with:
+          target: ${{ matrix.platform.target }}
+          before-script-linux: |
+            dnf install -y clang
+            curl -L "${{ steps.download_url.outputs.ffmpeg_url }}" -o ffmpeg.tar.gz
+            mkdir -p ${{ env.FFMPEG_DIR }}
+            tar -zxf ffmpeg.tar.gz -C ${{ env.FFMPEG_DIR }}
+          args: --release --out dist --interpreter '3.9 3.10 3.11 3.12 3.13 3.13t 3.14 3.14t pypy3.11'
+          manylinux: 2_39
           docker-options: -e CI -e FFMPEG_DIR=${{ env.FFMPEG_DIR }}
       - name: Upload wheels
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
