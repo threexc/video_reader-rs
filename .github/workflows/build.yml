@@ -23,6 +23,9 @@ jobs:
           - runner: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
             arch: aarch64
+          - runner: ubuntu-24.04-riscv
+            target: riscv64gc-unknown-linux-gnu
+            arch: riscv64
     env:
       FFMPEG_DIR: ${{ github.workspace }}/ffmpeg
       FFMPEG_VERS: 8.1.1-1
